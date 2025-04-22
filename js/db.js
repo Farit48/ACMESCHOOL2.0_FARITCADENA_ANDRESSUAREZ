@@ -1,12 +1,12 @@
 export function openDatabase() {
     return new Promise((resolve, reject) => {
-        const request = indexedDB.open("MiBaseDeDatos", 2); 
+        const request = indexedDB.open("MiBaseDeDatos", 1); 
 
         request.onupgradeneeded = function (event) {
             const db = event.target.result;
             if (!db.objectStoreNames.contains("usuarios")) {
                 const store = db.createObjectStore("usuarios", { keyPath: "id" });
-                store.createIndex("email", "password", { unique: true }); 
+                store.createIndex("email", "email", { unique: true }); 
             }
         };
 

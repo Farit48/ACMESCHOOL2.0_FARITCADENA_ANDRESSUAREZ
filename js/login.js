@@ -18,7 +18,7 @@ class Login extends HTMLElement {
         this.innerHTML = html + css
     }
 
-    static observedAttributes = ["on-registro", "out-registro"];
+    static observedAttributes = ["on-registro"];
 
     attributeChangedCallback(nombre, valorAntiguio, valorNuevo){
         switch (nombre){
@@ -42,8 +42,9 @@ class Login extends HTMLElement {
         btnLogin.addEventListener('click', async () => {
             const email = this.querySelector('#email').value;
             const password = this.querySelector('#password').value;
-
+            
             try {
+                
                 const db = await openDatabase();
                 const tx = db.transaction(["usuarios"], "readonly");
                 const store = tx.objectStore("usuarios");
@@ -52,7 +53,7 @@ class Login extends HTMLElement {
                 getRequest.onsuccess = () => {
                     const usuario = getRequest.result;
                     if (usuario && usuario.contraseña === password) {
-                        this.showDashboard(usuario);
+                        this.showPreDashboard(usuario);
                     } else {
                         alert("Usuario o contraseña incorrectos.");
                     }
@@ -66,16 +67,32 @@ class Login extends HTMLElement {
         });
     }
 
-    showDashboard(usuario) {
-        console.log(`hola ${usuario}`)
-        const main = document.getElementById('mainDashboard');
-        if (usuario.cargo === "Administrativo") {
-            console.log('hola esste es el dash')
-            window.location.href = '/dashboard.html'
-            main.innerHTML = `<h1>hola ADMIN</h1>`
-        } else if (usuario.cargo === "Profesor") {
-            window.location.href = '/dashboard.html'
-            main.innerHTML =`<h1>hola PROFE</h1>`
+    showPreDashboard(usuario) {
+        console.log(`Hola ${usuario.nombre}`);
+        const main = document.querySelector('main');
+        localStorage.setItem("usuarioActivo", JSON.stringify(usuario));
+
+        let tipo = usuario.cargo === "Administrativo" ? "ADMIN" : usuario.cargo === "Profesor" ? "PROFE" : null;
+
+        if (tipo) {
+            main.innerHTML = `
+            <style>
+            .Bienvenida {
+                opacity: 0;
+                animation: bienvenida 4s ease 0.5s forwards;
+            }
+            @keyframes bienvenida {
+                0% { opacity: 0; }
+                50% { opacity: 1; }
+                75% { opacity: 0; }
+                100% { opacity: 1; }
+            }
+            </style>
+            <h1 class="Bienvenida">Hola ${tipo} ${usuario.nombre}</h1>`;
+
+            setTimeout(() => {
+                window.location.href = 'dashboard.htm';
+            }, 5000);
         } else {
             alert("Tipo de usuario desconocido.");
         }
@@ -86,4 +103,6 @@ class Login extends HTMLElement {
 }
        
 
+
 customElements.define('login-component', Login);
+
