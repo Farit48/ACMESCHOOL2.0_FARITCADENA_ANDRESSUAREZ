@@ -6,7 +6,7 @@ export function openDatabase() {
             const db = event.target.result;
             if (!db.objectStoreNames.contains("usuarios")) {
                 const store = db.createObjectStore("usuarios", { keyPath: "id" });
-                store.createIndex("email", "email", { unique: true }); 
+                store.createIndex("email", "password", { unique: true }); 
             }
         };
 

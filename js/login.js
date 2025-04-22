@@ -7,8 +7,8 @@ class Login extends HTMLElement {
         const html = `
             <h2>Inicio de Secion</h2>
             <form action="">
-                <p>Usuario</p><input type="text">
-                <p>Contraseña</p><input type="password">
+                <p>Usuario</p><input id="email" type="text">
+                <p>Contraseña</p><input id="password" type="password">
             </form>
             <button id="btnLogin" type="button">Log In</button>
             <p>¿No tienes Usuario?</p><button id="btnRegistrar">Registrate Aqui</button>`;
@@ -67,11 +67,15 @@ class Login extends HTMLElement {
     }
 
     showDashboard(usuario) {
-        const main = document.querySelector('main');
+        console.log(`hola ${usuario}`)
+        const main = document.getElementById('mainDashboard');
         if (usuario.cargo === "Administrativo") {
-            main.innerHTML = `<dashboard-administrativo></dashboard-administrativo>`;
+            console.log('hola esste es el dash')
+            window.location.href = '/dashboard.html'
+            main.innerHTML = `<h1>hola ADMIN</h1>`
         } else if (usuario.cargo === "Profesor") {
-            main.innerHTML = `<dashboard-profesor></dashboard-profesor>`;
+            window.location.href = '/dashboard.html'
+            main.innerHTML =`<h1>hola PROFE</h1>`
         } else {
             alert("Tipo de usuario desconocido.");
         }
