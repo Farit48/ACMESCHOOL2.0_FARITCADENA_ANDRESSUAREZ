@@ -1,43 +1,68 @@
 class Dash extends HTMLElement {
-    constructor(){
+    constructor() {
         super();
+        this.attachShadow({ mode: 'open' });  // Crear shadow DOM
+    }
+
+    connectedCallback() {
         const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
-        this.innerHTML = `<h1>Hola, ${usuario.cargo} ${usuario.nombre}</h1>`
         if (usuario) {
-            this.setAttribute('cargo', usuario.cargo);
+            this.render(usuario.cargo, usuario.nombre);
+        } else {
+            this.shadowRoot.innerHTML = `<h1>No hay usuario activo</h1>`;
         }
     }
-    static observedAttributes = ["cargo"];
-    attributeChangedCallback(nombre, oldVal, newVal) {
-        if (nombre === 'cargo') {
-            this.render(newVal);
-        }
-    }
-    render(cargo) {
+
+    render(cargo, nombre) {
         if (cargo === 'Administrativo') {
             this.shadowRoot.innerHTML = `
                 <style>.admin { color: blue; }</style>
-                <h2 class="admin">Bienvenido Administrativo</h2>
+                <header>
+                    <h2>Acme Shool Institute</h2>
+                    <p>Bienvenido ${cargo} ${nombre}</p>
+                    <p>Settings</p>
+                </header>
+                <main>
+                    <section>
+                        <h2>Cursos Asociados</h2>
+                        <button type="button">Registrar nuevo</button>
+                    </section>
+                    <section>
+                        <h2>Profesores</h2>
+                        <button type="button">Registrar nuevo</button>
+                    </section>
+                    <section>
+                        <h2>Estudiantes</h2>
+                        <button type="button">Registrar nuevo</button>
+                    </section>
+                    
+                </main>
             `;
         } else if (cargo === 'Profesor') {
             this.shadowRoot.innerHTML = `
-                <style>.profe { color: green; }</style>
-                <h2 class="profe">Bienvenido Profesor</h2>
+                <style>.admin { color: blue; }</style>
+                <header>
+                    <h2>Acme Shool Institute</h2>
+                    <p>Bienvenido ${cargo} ${nombre}</p>
+                    <p>Settings</p>
+                </header>
+                <main>
+                    <section>
+                        <h2>Cursos Asociados</h2>
+                        
+                    </section>
+                    
+                    <section>
+                        <h2>Calificar Estudiantes</h2>
+                        <button type="button">Califiacar</button>
+                    </section>
+                    
+                </main>
             `;
         } else {
             this.shadowRoot.innerHTML = `<h2>Tipo de usuario no reconocido</h2>`;
         }
     }
-    connectedCallback(){
-        console.log('tamo')
-        const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
-        const cargo = usuario?.cargo;
-        if (cargo === "Profesor") {
-            console.log("Mostrar dashboard de profesor");
-        } else if (cargo === "Administrativo") {
-            console.log("Mostrar dashboard administrativo");
-        }
-    }
 }
 
-customElements.define('dash-admin', Dash)
+customElements.define('dash-admin', Dash);
