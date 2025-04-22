@@ -33,58 +33,53 @@ class Login extends HTMLElement {
     connectedCallback(){
         const btnRegistrar = document.getElementById('btnRegistrar')
         const btnLogin = document.getElementById('btnLogin');
-        
-        btnLogin.addEventListener('click', async (e) => {
-            e.preventDefault();
-
-            const emailInput = this.querySelector('input[type="text"]').value;
-            const passwordInput = this.querySelector('input[type="password"]').value;
-
-            try {
-                const db = await openDatabase();
-                const transaction = db.transaction(["usuarios"], "readonly");
-                const store = transaction.objectStore("usuarios");
-
-                let found = false;
-
-                const cursorRequest = store.openCursor();
-
-                cursorRequest.onsuccess = function (e) {
-                    const cursor = e.target.result;
-                    if (cursor) {
-                        const usuario = cursor.value;
-                        if (usuario.email === emailInput) {
-                            found = true;
-                            if (usuario.contraseña === passwordInput) {
-                                alert(`✅ Bienvenido, ${usuario.nombre}`);
-                                localStorage.setItem("usuarioActivo", JSON.stringify(usuario));
-                                
-                            } else {
-                                alert("❌ Contraseña incorrecta");
-                            }
-                            return;
-                        }
-                        cursor.continue();
-                    } else {
-                        if (!found) {
-                            alert("⚠️ Usuario no registrado");
-                        }
-                    }
-                };
-            } catch (error) {
-                console.error("Error al abrir la base de datos:", error);
-            }
-        });
-
-
-
         btnRegistrar.addEventListener('click', ()=>{
             const main = document.querySelector('main')
             main.innerHTML =`
             <${this.registroComponent} out-registro="login-component"></${this.registroComponent}> 
             `
         })
-        console.log('conectado')
+        btnLogin.addEventListener('click', async () => {
+            const email = this.querySelector('#email').value;
+            const password = this.querySelector('#password').value;
+
+            try {
+                const db = await openDatabase();
+                const tx = db.transaction(["usuarios"], "readonly");
+                const store = tx.objectStore("usuarios");
+
+                const getRequest = store.index("email").get(email);
+                getRequest.onsuccess = () => {
+                    const usuario = getRequest.result;
+                    if (usuario && usuario.contraseña === password) {
+                        this.showDashboard(usuario);
+                    } else {
+                        alert("Usuario o contraseña incorrectos.");
+                    }
+                };
+                getRequest.onerror = () => {
+                    alert("No se encontró el usuario.");
+                };
+            } catch (err) {
+                console.error("Error al acceder a la base de datos:", err);
+            }
+        });
     }
+
+    showDashboard(usuario) {
+        const main = document.querySelector('main');
+        if (usuario.cargo === "Administrativo") {
+            main.innerHTML = `<dashboard-administrativo></dashboard-administrativo>`;
+        } else if (usuario.cargo === "Profesor") {
+            main.innerHTML = `<dashboard-profesor></dashboard-profesor>`;
+        } else {
+            alert("Tipo de usuario desconocido.");
+        }
+    }
+
+  
+    
 }
+       
+
 customElements.define('login-component', Login);
