@@ -6,15 +6,51 @@
     <title>Document</title>
 </head>
 <body>
-    
-    <div>
-        
-    </div>
-    
+
+    <!-- Header -->
+    <header id="header"></header>
+   
     <main id="main-Dashboard">
-        <dash-admin ></dash-admin>   
+        
+        <!-- Template para Administrativos -->
+        <template id="template-admin">
+            <main>
+                <section>
+                    <h2>Cursos</h2>
+                    <div id="frmCurso"></div>
+                    <button id="btnNuevoCurso" type="button">Registrar nuevo</button>
+                </section>
+                <section>
+                    <h2>Estudiantes</h2>
+                    <button id="btnNuevoEstudiante" type="button">Registrar nuevo</button>
+                    
+                    
+                </section>
+                
+            </main>
+        </template>
+
+        
+        <template id="template-profe">
+            <main>
+                <section>
+                    <h2>Cursos Asociados</h2>
+                    <!-- Aquí podrían mostrarse los cursos del profesor -->
+                </section>
+                
+                <section>
+                    <h2>Calificar Estudiantes</h2>
+                    <button type="button">Calificar</button>
+                </section>
+            </main>
+        </template>
+        
+        <!-- Componente Dash -->
+        <dash-main></dash-main>   
+
     </main>
     
+    <!-- Script para el componente Dashboard -->
     <script type="module" src="js/dashboard.js"></script>
 </body>
 </html>
