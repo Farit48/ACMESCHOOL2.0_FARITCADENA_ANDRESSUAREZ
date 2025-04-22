@@ -1,7 +1,7 @@
 class Dash extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });  // Crear shadow DOM
+        this.attachShadow({ mode: 'open' });  
     }
 
     connectedCallback() {
@@ -63,6 +63,7 @@ class Dash extends HTMLElement {
             this.shadowRoot.innerHTML = `<h2>Tipo de usuario no reconocido</h2>`;
         }
     }
+    
 }
 
 customElements.define('dash-admin', Dash);
