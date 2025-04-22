@@ -1,3 +1,4 @@
+
 class Login extends HTMLElement {
     constructor(){
 
@@ -32,23 +33,22 @@ class Login extends HTMLElement {
     connectedCallback(){
         const btnRegistrar = document.getElementById('btnRegistrar')
         const btnLogin = document.getElementById('btnLogin');
-        btnLogin.addEventListener('click', (e) => {
+        
+        btnLogin.addEventListener('click', async (e) => {
             e.preventDefault();
-    
+
             const emailInput = this.querySelector('input[type="text"]').value;
             const passwordInput = this.querySelector('input[type="password"]').value;
-    
-            const request = indexedDB.open("USERS", 1);
-    
-            request.onsuccess = function (event) {
-                const db = event.target.result;
-                const transaction = db.transaction(["USERS"], "readonly");
-                const store = transaction.objectStore("USERS");
-    
+
+            try {
+                const db = await openDatabase();
+                const transaction = db.transaction(["usuarios"], "readonly");
+                const store = transaction.objectStore("usuarios");
+
                 let found = false;
-    
+
                 const cursorRequest = store.openCursor();
-    
+
                 cursorRequest.onsuccess = function (e) {
                     const cursor = e.target.result;
                     if (cursor) {
@@ -71,12 +71,12 @@ class Login extends HTMLElement {
                         }
                     }
                 };
-            };
-    
-            request.onerror = () => {
-                console.log("❌ Error al abrir la base de datos.");
-            };
+            } catch (error) {
+                console.error("Error al abrir la base de datos:", error);
+            }
         });
+
+
 
         btnRegistrar.addEventListener('click', ()=>{
             const main = document.querySelector('main')
