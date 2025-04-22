@@ -23,8 +23,7 @@ class Login extends HTMLElement {
             case "on-registro":
                 this.registroComponent = valorNuevo;
                 break;
-            case "out-registro":
-                this.loginComponent = valorAntiguio
+            
 
         }
     }

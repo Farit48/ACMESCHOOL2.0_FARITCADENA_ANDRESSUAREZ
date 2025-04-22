@@ -3,8 +3,9 @@ class Registro extends HTMLElement {
 
         super();
 
+          
         const html = `
-            <h1>Registro</h1>
+            <h2>Registro</h2>
             <section>
                 <form action="#">
                     <p>Numero de identificacion</p>
@@ -31,6 +32,7 @@ class Registro extends HTMLElement {
         const css = ``
 
         this.innerHTML = html + css
+       
     }
     static observedAttributes = ["out-registro"];
 
@@ -44,6 +46,48 @@ class Registro extends HTMLElement {
     }
 
     connectedCallback(){
+        const btnRegistrar= document.getElementById('btnRegistrar')
+        const request = indexedDB.open("MiBaseDeDatos", 1);
+        request.onupgradeneeded = function(event) {
+            let db = event.target.result;
+            if (!db.objectStoreNames.contains("USERS")) {
+                db.createObjectStore("USERS", { data: "id" });
+            }
+        };
+        request.onsuccess = function(event){
+            let db = event.target.result;
+            btnRegistrar.addEventListener('click', (e)=>{
+                e.preventDefault(); 
+                const data = {
+                    id:document.getElementById('numID').value,
+                    nombre:document.getElementById('Nombre').value,
+                    cargo:document.querySelector('input[name="cargo"]:checked').value,
+                    email:document.getElementById('email').value,
+                    contraseña:document.getElementById('password').value,
+                }
+                const transaction = db.transaction(["USERS"], "readwrite")
+                const store = transaction.objectStore("USERS");
+                const addRequest = store.add(data);
+                addRequest.onsuccess = () => {
+                    console.log("Usuario agregado correctamente:", data);
+                };
+                addRequest.onerror = () => {
+                    console.log("Error al agregar el usuario. Puede que el ID ya exista.");
+                };
+                const getRequest = store.get(data.id);
+                getRequest.onsuccess = () => {
+                console.log("Usuario encontrado:", getRequest.result);
+                };
+            })
+            
+        }
+        request.onerror = function () {
+            console.log("Error al abrir la base de datos");
+        };
+        
+       
+       
+       
         const btnCancelar = document.getElementById('btnCancelar')
         btnCancelar.addEventListener('click', ()=>{
             const main = document.querySelector('main')
