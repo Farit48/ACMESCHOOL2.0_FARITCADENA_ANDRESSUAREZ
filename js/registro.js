@@ -24,7 +24,7 @@ class Registro extends HTMLElement {
                         margin-top:30px;
                     }
                     </style>
-                    <button id="btnRegistrar" type="submit" >REGISTRAR</button>
+                    <button  id="btnRegistrar" type="button" >REGISTRAR</button>
                     <button id="btnCancelar" type="submit" >CANCELAR</button>
                 </form>
             <section>`;
@@ -47,7 +47,7 @@ class Registro extends HTMLElement {
 
     connectedCallback(){
         const btnRegistrar= document.getElementById('btnRegistrar')
-        const request = indexedDB.open("MiBaseDeDatos", 1);
+        const request = indexedDB.open("USERS", 1);
         request.onupgradeneeded = function(event) {
             let db = event.target.result;
             if (!db.objectStoreNames.contains("USERS")) {
@@ -67,11 +67,15 @@ class Registro extends HTMLElement {
                 }
                 const transaction = db.transaction(["USERS"], "readwrite")
                 const store = transaction.objectStore("USERS");
-                const addRequest = store.add(data);
-                addRequest.onsuccess = () => {
-                    console.log("Usuario agregado correctamente:", data);
-                };
-                addRequest.onerror = () => {
+                const checkRequest = store.get(data.id);
+                checkRequest.onsuccess = () => {
+                    if (checkRequest.result) {
+                        alert("Ya existe un usuario con ese ID");
+                    } else {
+                        store.add(data);
+                    }
+};
+                checkRequest.onerror = () => {
                     console.log("Error al agregar el usuario. Puede que el ID ya exista.");
                 };
                 const getRequest = store.get(data.id);
