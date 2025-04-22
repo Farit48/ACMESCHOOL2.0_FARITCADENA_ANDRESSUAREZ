@@ -1,4 +1,4 @@
-
+import { openDatabase } from './db.js';
 class Login extends HTMLElement {
     constructor(){
 
@@ -58,7 +58,7 @@ class Login extends HTMLElement {
                             if (usuario.contraseña === passwordInput) {
                                 alert(`✅ Bienvenido, ${usuario.nombre}`);
                                 localStorage.setItem("usuarioActivo", JSON.stringify(usuario));
-                                // window.location.href = "dashboard.html"; // si quieres redirigir
+                                
                             } else {
                                 alert("❌ Contraseña incorrecta");
                             }

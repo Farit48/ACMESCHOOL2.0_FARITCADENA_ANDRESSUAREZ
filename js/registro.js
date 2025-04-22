@@ -1,3 +1,4 @@
+import { openDatabase } from './db.js'; 
 class Registro extends HTMLElement {
     constructor(){
 
@@ -47,51 +48,50 @@ class Registro extends HTMLElement {
 
     connectedCallback(){
         const btnRegistrar= document.getElementById('btnRegistrar')
-        const request = indexedDB.open("USERS", 1);
-        request.onupgradeneeded = function(event) {
-            let db = event.target.result;
-            if (!db.objectStoreNames.contains("USERS")) {
-                db.createObjectStore("USERS", { data: "id" });
-            }
-        };
-        request.onsuccess = function(event){
-            let db = event.target.result;
-            btnRegistrar.addEventListener('click', (e)=>{
-                e.preventDefault(); 
-                const data = {
-                    id:document.getElementById('numID').value,
-                    nombre:document.getElementById('Nombre').value,
-                    cargo:document.querySelector('input[name="cargo"]:checked').value,
-                    email:document.getElementById('email').value,
-                    contraseña:document.getElementById('password').value,
+        btnRegistrar.addEventListener('click', async (e) => {
+            e.preventDefault();
+    
+            const nuevoUsuario = {
+                id: parseInt(this.querySelector('#numID').value),
+                nombre: this.querySelector('#Nombre').value,
+                cargo: this.querySelector('input[name="cargo"]:checked').value,
+                email: this.querySelector('#email').value,
+                contraseña: this.querySelector('#password').value,
+            };
+    
+            try {
+                const db = await openDatabase();
+    
+                
+                if (!db.objectStoreNames.contains("usuarios")) {
+                    db.close();
+                    const upgradeRequest = indexedDB.open("MiBaseDeDatos", db.version + 1);
+                    upgradeRequest.onupgradeneeded = function (event) {
+                        const db = event.target.result;
+                        db.createObjectStore("usuarios", { keyPath: "id" });
+                    };
+                    upgradeRequest.onsuccess = async function () {
+                        (await openDatabase()).transaction(["usuarios"], "readwrite")
+                            .objectStore("usuarios").add(nuevoUsuario);
+                        alert("Usuario registrado después de crear la store.");
+                    };
+                    return;
                 }
-                const transaction = db.transaction(["USERS"], "readwrite")
-                const store = transaction.objectStore("USERS");
-                const checkRequest = store.get(data.id);
-                checkRequest.onsuccess = () => {
-                    if (checkRequest.result) {
-                        alert("Ya existe un usuario con ese ID");
-                    } else {
-                        store.add(data);
-                    }
-};
-                checkRequest.onerror = () => {
-                    console.log("Error al agregar el usuario. Puede que el ID ya exista.");
+    
+                const tx = db.transaction(["usuarios"], "readwrite");
+                const store = tx.objectStore("usuarios");
+                const addReq = store.add(nuevoUsuario);
+    
+                addReq.onsuccess = () => alert("Usuario registrado exitosamente.");
+                addReq.onerror = (e) => {
+                    alert("Error: ya existe un usuario con ese ID.");
+                    console.error(e);
                 };
-                const getRequest = store.get(data.id);
-                getRequest.onsuccess = () => {
-                console.log("Usuario encontrado:", getRequest.result);
-                };
-            })
-            
-        }
-        request.onerror = function () {
-            console.log("Error al abrir la base de datos");
-        };
-        
-       
-       
-       
+    
+            } catch (err) {
+                console.error("Error al registrar usuario:", err);
+            }
+        });
         const btnCancelar = document.getElementById('btnCancelar')
         btnCancelar.addEventListener('click', ()=>{
             const main = document.querySelector('main')

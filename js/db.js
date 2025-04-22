@@ -1,6 +1,6 @@
 export function openDatabase() {
     return new Promise((resolve, reject) => {
-        const request = indexedDB.open("MiBaseDeDatos", 1);
+        const request = indexedDB.open("MiBaseDeDatos", 2);; 
 
         request.onupgradeneeded = function (event) {
             const db = event.target.result;
